@@ -2,6 +2,6 @@
 #define BLE_H
 
 void startBLEStack();
-void wrapperBLE(void (*wrappedFunc)(uint8_t));
+void wrapperBLE(unsigned long (*wrappedFunc)(uint8_t));
 
 #endif

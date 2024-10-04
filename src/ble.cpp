@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include "WiFiS3.h"
@@ -31,7 +30,7 @@ void printBLEDeviceInfo(BLEDevice* device)
   Serial.println();
 }
 
-void wrapperBLE(void (*wrappedFunc)(uint8_t))
+void wrapperBLE(unsigned long (*wrappedFunc)(uint8_t))
 {
   // Check if we have found a device
   BLEDevice device = BLE.available();  
@@ -88,8 +87,8 @@ void wrapperBLE(void (*wrappedFunc)(uint8_t))
   // While connected to device run wrappedFunc
   // separate BLE loop from call to wrappedFunc
   uint8_t dataBLE = 0;
-  unsigned long updateTimeInterval = 2000; 
-  unsigned long lastUpdateTime = millis();
+  unsigned long updateTimeInterval = 0; 
+  unsigned long lastUpdateTime = millis(); // will be updated by wrappedFunc
   while (device.connected()) 
   {
     // BLE events are not processed automatically - need to call poll()
@@ -104,7 +103,7 @@ void wrapperBLE(void (*wrappedFunc)(uint8_t))
     // Run game logic every updateTimeInterval
     if (millis() - lastUpdateTime > updateTimeInterval)
     {
-      wrappedFunc(dataBLE);
+      updateTimeInterval = wrappedFunc(dataBLE);
       lastUpdateTime = millis();
     }
   }
